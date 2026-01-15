@@ -13,6 +13,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.CircularProgressIndicator
@@ -47,6 +48,7 @@ import com.permissionmonitor.ui.viewmodel.AppListViewModel
 @Composable
 fun AppListScreen(
     onAppClick: (String) -> Unit,
+    onAboutClick: () -> Unit,
     viewModel: AppListViewModel = viewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
@@ -86,6 +88,13 @@ fun AppListScreen(
                         Icon(
                             Icons.Default.Refresh, 
                             contentDescription = "刷新",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
+                    IconButton(onClick = onAboutClick) {
+                        Icon(
+                            Icons.Default.Info, 
+                            contentDescription = "关于",
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }

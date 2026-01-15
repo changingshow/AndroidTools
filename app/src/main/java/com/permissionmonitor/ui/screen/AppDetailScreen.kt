@@ -107,23 +107,7 @@ fun AppDetailScreen(
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
-                ),
-                actions = {
-                    IconButton(
-                        onClick = {
-                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                data = Uri.parse("package:$packageName")
-                            }
-                            context.startActivity(intent)
-                        }
-                    ) {
-                        Icon(
-                            Icons.Default.Settings, 
-                            contentDescription = "系统设置",
-                            tint = MaterialTheme.colorScheme.onPrimary
-                        )
-                    }
-                }
+                )
             )
         }
     ) { paddingValues ->
