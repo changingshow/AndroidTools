@@ -23,7 +23,6 @@
 ##############################################################################
 
 # Attempt to set APP_HOME
-
 # Resolve links: $0 may be a link
 app_path=$0
 
@@ -41,12 +40,6 @@ do
 done
 
 APP_HOME=$( cd "${APP_HOME:-./}" && pwd -P ) || exit
-
-APP_NAME="Gradle"
-APP_BASE_NAME=${0##*/}
-
-# Add default JVM options here. You can also use JAVA_OPTS and GRADLE_OPTS to pass JVM options to this script.
-DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 
 # Use the maximum available, or set MAX_FD != -1 to use that value.
 MAX_FD=maximum
@@ -76,27 +69,22 @@ esac
 
 CLASSPATH=$APP_HOME/gradle/wrapper/gradle-wrapper.jar
 
-
 # Determine the Java command to use to start the JVM.
 if [ -n "$JAVA_HOME" ] ; then
     if [ -x "$JAVA_HOME/jre/sh/java" ] ; then
-        # IBM's JDK on AIX uses strange locations for the executables
         JAVACMD=$JAVA_HOME/jre/sh/java
     else
         JAVACMD=$JAVA_HOME/bin/java
     fi
     if [ ! -x "$JAVACMD" ] ; then
-        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME
-
-Please set the JAVA_HOME variable in your environment to match the
-location of your Java installation."
+        die "ERROR: JAVA_HOME is set to an invalid directory: $JAVA_HOME"
     fi
 else
     JAVACMD=java
-    which java >/dev/null 2>&1 || die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH.
-
-Please set the JAVA_HOME variable in your environment to match the
-location of your Java installation."
+    if ! command -v java >/dev/null 2>&1
+    then
+        die "ERROR: JAVA_HOME is not set and no 'java' command could be found in your PATH."
+    fi
 fi
 
 # Increase the maximum file descriptors if we can.
@@ -119,62 +107,20 @@ fi
 #   * the main class name
 #   * -classpath
 #   * -D...appname settings
-#   * --module-path (only if needed)
 #   * DEFAULT_JVM_OPTS, JAVA_OPTS, and GRADLE_OPTS environment variables.
 
 # For Cygwin or MSYS, switch paths to Windows format before running java
 if "$cygwin" || "$msys" ; then
     APP_HOME=$( cygpath --path --mixed "$APP_HOME" )
     CLASSPATH=$( cygpath --path --mixed "$CLASSPATH" )
-
     JAVACMD=$( cygpath --unix "$JAVACMD" )
-
-    # Now convert the arguments - kludge to limit ourselves to /bin/sh
-    for arg do
-        if
-            case $arg in                                #(
-              -*)   false ;;                            # don't mess with options #(
-              /?*)  t=${arg#)}; t=/${t%%/*}             # looks like a POSIX filepath
-                    [ -e "$t" ] ;;                      #(
-              *)    false ;;
-            esac
-        then
-            arg=$( cygpath --path --ignore --mixed "$arg" )
-        fi
-        # Roll the args list around exactly as many times as the number of
-        # temporary arguments, so each argument winds up back in the position
-        # where it started, but possibly modified.
-        #
-        # NB: aass://gradle.org/release-checksums
-        shift                   # remove old arg
-        set -- "$@" "$arg"      # push replacement arg
-    done
 fi
 
-# Collect all arguments for the java command;
-#   * $DEFAULT_JVM_OPTS, $JAVA_OPTS, and $GRADLE_OPTS can contain fragments of
-#     temporary arguments, e.g. JVM://gradle.org/release-checksums
-#   * $APP_HOME://gradle.org/release-checksums
-set -- \
-        "-Dorg.gradle.appname=$APP_BASE_NAME" \
-        -classpath "$CLASSPATH" \
-        org.gradle.wrapper.GradleWrapperMain \
-        "$@"
+# Add default JVM options here.
+DEFAULT_JVM_OPTS='"-Xmx64m" "-Xms64m"'
 
-# Stop when "xargs" is not available.
-if ! command -v xargs >/dev/null 2>&1
-then
-    die "xargs is not available"
-fi
-
-# Use "xargs" to parse quoted args.
-#
-# With -n://gradle.org/release-checksums
-eval "set -- $(
-        printf '%s\n' "$DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS" |
-        xargs -n1 |
-        sed ' s~[^ ]~quoteall~g; ' |
-        xargs printf ' "%s"'
-    )" '"$@"'
-
-exec "$JAVACMD" "$@"
+exec "$JAVACMD" $DEFAULT_JVM_OPTS $JAVA_OPTS $GRADLE_OPTS \
+    "-Dorg.gradle.appname=${0##*/}" \
+    -classpath "$CLASSPATH" \
+    org.gradle.wrapper.GradleWrapperMain \
+    "$@"
