@@ -53,8 +53,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.core.graphics.drawable.toBitmap
 import com.permissionmonitor.data.model.AppInfo
+import com.permissionmonitor.ui.components.drawableToBitmap
 import com.permissionmonitor.data.model.PermissionDetail
 import com.permissionmonitor.data.model.PermissionRisk
 import com.permissionmonitor.data.repository.AppRepository
@@ -190,7 +190,7 @@ private fun AppHeader(appInfo: AppInfo) {
             ) {
                 appInfo.icon?.let { drawable ->
                     Image(
-                        bitmap = drawable.toBitmap().asImageBitmap(),
+                        bitmap = drawableToBitmap(drawable).asImageBitmap(),
                         contentDescription = appInfo.appName,
                         modifier = Modifier.size(64.dp)
                     )
