@@ -1,6 +1,9 @@
 package com.permissionmonitor.ui.viewmodel
 
 import android.app.Application
+import android.content.Intent
+import android.net.Uri
+import android.provider.Settings
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.permissionmonitor.data.model.AppInfo
@@ -17,7 +20,11 @@ data class AppListUiState(
     val isLoading: Boolean = true,
     val includeSystemApps: Boolean = false,
     val searchQuery: String = "",
-    val error: String? = null
+    val error: String? = null,
+    val needsPermission: Boolean = false,
+    val totalApps: Int = 0,
+    val safeApps: Int = 0,
+    val riskyApps: Int = 0
 )
 
 class AppListViewModel(application: Application) : AndroidViewModel(application) {
@@ -40,11 +47,26 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
                 allApps = withContext(Dispatchers.IO) {
                     repository.getInstalledApps(_uiState.value.includeSystemApps)
                 }
+                
+                // 如果获取到的应用太少（少于5个），可能是没有权限
+                val needsPermission = allApps.size < 5 && !_uiState.value.includeSystemApps
+                
+                // 计算统计数据
+                val safeApps = allApps.count { it.dangerousPermissions == 0 }
+                val riskyApps = allApps.count { it.dangerousPermissions > 0 }
+                
+                _uiState.value = _uiState.value.copy(
+                    needsPermission = needsPermission,
+                    totalApps = allApps.size,
+                    safeApps = safeApps,
+                    riskyApps = riskyApps
+                )
+                
                 filterApps()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
                     isLoading = false,
-                    error = "加载应用列表失败: ${e.message}"
+                    error = "加载失败: ${e.message}"
                 )
             }
         }
@@ -60,6 +82,15 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
     fun updateSearchQuery(query: String) {
         _uiState.value = _uiState.value.copy(searchQuery = query)
         filterApps()
+    }
+    
+    fun openAppSettings() {
+        val context = getApplication<Application>()
+        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.parse("package:${context.packageName}")
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+        context.startActivity(intent)
     }
     
     private fun filterApps() {

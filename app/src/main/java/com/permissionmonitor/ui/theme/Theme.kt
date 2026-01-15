@@ -15,26 +15,45 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 
+// Brand colors
+val Blue500 = Color(0xFF2196F3)
+val Blue700 = Color(0xFF1976D2)
+val Blue100 = Color(0xFFBBDEFB)
+
+val Green500 = Color(0xFF4CAF50)
+val Orange500 = Color(0xFFFF9800)
+val Red500 = Color(0xFFF44336)
+
 private val DarkColorScheme = darkColorScheme(
-    primary = Color(0xFF6200EE),
+    primary = Blue500,
+    onPrimary = Color.White,
+    primaryContainer = Blue700,
+    onPrimaryContainer = Color.White,
     secondary = Color(0xFF03DAC6),
-    tertiary = Color(0xFF3700B3),
     background = Color(0xFF121212),
-    surface = Color(0xFF1E1E1E)
+    surface = Color(0xFF1E1E1E),
+    surfaceVariant = Color(0xFF2D2D2D),
+    onSurface = Color.White,
+    onSurfaceVariant = Color(0xFFB0B0B0)
 )
 
 private val LightColorScheme = lightColorScheme(
-    primary = Color(0xFF6200EE),
+    primary = Blue500,
+    onPrimary = Color.White,
+    primaryContainer = Blue100,
+    onPrimaryContainer = Blue700,
     secondary = Color(0xFF03DAC6),
-    tertiary = Color(0xFF3700B3),
-    background = Color(0xFFFFFBFE),
-    surface = Color(0xFFFFFBFE)
+    background = Color(0xFFF5F5F5),
+    surface = Color.White,
+    surfaceVariant = Color(0xFFF0F0F0),
+    onSurface = Color(0xFF1C1C1C),
+    onSurfaceVariant = Color(0xFF666666)
 )
 
 @Composable
 fun PermissionMonitorTheme(
     darkTheme: Boolean = isSystemInDarkTheme(),
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorScheme = when {
