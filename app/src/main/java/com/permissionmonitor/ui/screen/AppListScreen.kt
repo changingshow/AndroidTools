@@ -13,15 +13,16 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
-import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -82,8 +83,6 @@ fun AppListScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 actions = {
-                    var showSortMenu by remember { mutableStateOf(false) }
-                    
                     IconButton(onClick = { viewModel.loadApps() }) {
                         Icon(
                             Icons.Default.Refresh, 
@@ -91,36 +90,6 @@ fun AppListScreen(
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
-                    
-                    Box {
-                        IconButton(onClick = { showSortMenu = true }) {
-                            Icon(
-                                Icons.Default.Sort,
-                                contentDescription = "排序",
-                                tint = MaterialTheme.colorScheme.onPrimary
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showSortMenu,
-                            onDismissRequest = { showSortMenu = false }
-                        ) {
-                            SortType.entries.forEach { sortType ->
-                                DropdownMenuItem(
-                                    text = { 
-                                        Text(
-                                            text = sortType.label,
-                                            fontWeight = if (uiState.sortType == sortType) FontWeight.Bold else FontWeight.Normal
-                                        )
-                                    },
-                                    onClick = {
-                                        viewModel.setSortType(sortType)
-                                        showSortMenu = false
-                                    }
-                                )
-                            }
-                        }
-                    }
-                    
                     IconButton(onClick = onAboutClick) {
                         Icon(
                             Icons.Default.Info, 
@@ -206,10 +175,14 @@ fun AppListScreen(
                         )
                     }
                     
-                    // 筛选器
+                    // 筛选器和排序
                     item {
+                        var showSortMenu by remember { mutableStateOf(false) }
+                        
                         Row(
-                            modifier = Modifier.padding(horizontal = 16.dp, vertical = 4.dp),
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = 16.dp, vertical = 4.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             FilterChip(
@@ -223,6 +196,49 @@ fun AppListScreen(
                                 style = MaterialTheme.typography.bodySmall,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
+                            
+                            Spacer(modifier = Modifier.weight(1f))
+                            
+                            // 排序按钮
+                            Box {
+                                FilterChip(
+                                    selected = true,
+                                    onClick = { showSortMenu = true },
+                                    label = { 
+                                        Row(verticalAlignment = Alignment.CenterVertically) {
+                                            Text(uiState.sortType.label)
+                                            Icon(
+                                                Icons.Default.ArrowDropDown,
+                                                contentDescription = null,
+                                                modifier = Modifier.padding(start = 2.dp)
+                                            )
+                                        }
+                                    },
+                                    colors = FilterChipDefaults.filterChipColors(
+                                        selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+                                    )
+                                )
+                                DropdownMenu(
+                                    expanded = showSortMenu,
+                                    onDismissRequest = { showSortMenu = false }
+                                ) {
+                                    SortType.entries.forEach { sortType ->
+                                        DropdownMenuItem(
+                                            text = { 
+                                                Text(
+                                                    text = sortType.label,
+                                                    fontWeight = if (uiState.sortType == sortType) FontWeight.Bold else FontWeight.Normal
+                                                )
+                                            },
+                                            onClick = {
+                                                viewModel.setSortType(sortType)
+                                                showSortMenu = false
+                                            }
+                                        )
+                                    }
+                                }
+                            }
                         }
                     }
                     
