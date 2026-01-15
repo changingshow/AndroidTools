@@ -25,11 +25,15 @@ jobs:
     - name: Setup Android SDK
       uses: android-actions/setup-android@v3
 
+    - name: Decode Keystore
+      run: |
+        echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 -d > release-key.jks
+
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
     - name: Build Debug APK
-      run: ./gradlew assembleDebug --stacktrace
+      run: ./gradlew assembleDebug
 
     - name: Upload Debug APK
       uses: actions/upload-artifact@v4
@@ -38,12 +42,15 @@ jobs:
         path: app/build/outputs/apk/debug/*.apk
         retention-days: 30
 
-    - name: Build Release APK (unsigned)
+    - name: Build Release APK
+      env:
+        KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
+        KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
       run: ./gradlew assembleRelease
 
     - name: Upload Release APK
       uses: actions/upload-artifact@v4
       with:
-        name: PermissionMonitor-release-unsigned
+        name: PermissionMonitor-release
         path: app/build/outputs/apk/release/*.apk
         retention-days: 30
