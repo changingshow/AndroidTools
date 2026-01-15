@@ -20,7 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Warning
@@ -31,7 +31,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
@@ -41,10 +40,8 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -54,12 +51,13 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.permissionmonitor.data.model.AppInfo
-import com.permissionmonitor.ui.components.drawableToBitmap
 import com.permissionmonitor.data.model.PermissionDetail
 import com.permissionmonitor.data.model.PermissionRisk
 import com.permissionmonitor.data.repository.AppRepository
 import com.permissionmonitor.data.source.PermissionClassifier
-import kotlinx.coroutines.launch
+import com.permissionmonitor.ui.components.drawableToBitmap
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,17 +67,16 @@ fun AppDetailScreen(
 ) {
     val context = LocalContext.current
     val repository = remember { AppRepository(context) }
-    val scope = rememberCoroutineScope()
     
     var appInfo by remember { mutableStateOf<AppInfo?>(null) }
     var isLoading by remember { mutableStateOf(true) }
-    var selectedTab by remember { mutableIntStateOf(0) }
+    var selectedTab by remember { mutableStateOf(0) }
     
     LaunchedEffect(packageName) {
-        scope.launch {
+        withContext(Dispatchers.IO) {
             appInfo = repository.getAppInfo(packageName)
-            isLoading = false
         }
+        isLoading = false
     }
     
     Scaffold(
@@ -88,7 +85,7 @@ fun AppDetailScreen(
                 title = { Text(appInfo?.appName ?: "应用详情") },
                 navigationIcon = {
                     IconButton(onClick = onBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "返回")
+                        Icon(Icons.Filled.ArrowBack, contentDescription = "返回")
                     }
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
@@ -128,12 +125,13 @@ fun AppDetailScreen(
                 Text("无法加载应用信息")
             }
         } else {
+            val currentAppInfo = appInfo!!
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
             ) {
-                AppHeader(appInfo = appInfo!!)
+                AppHeader(appInfo = currentAppInfo)
                 
                 TabRow(selectedTabIndex = selectedTab) {
                     Tab(
@@ -154,12 +152,12 @@ fun AppDetailScreen(
                 }
                 
                 val filteredPermissions = when (selectedTab) {
-                    0 -> appInfo!!.permissions
-                    1 -> appInfo!!.permissions.filter { 
+                    0 -> currentAppInfo.permissions
+                    1 -> currentAppInfo.permissions.filter { 
                         it.riskLevel == PermissionRisk.DANGEROUS || it.riskLevel == PermissionRisk.HIGH 
                     }
-                    2 -> appInfo!!.permissions.filter { it.isGranted }
-                    else -> appInfo!!.permissions
+                    2 -> currentAppInfo.permissions.filter { it.isGranted }
+                    else -> currentAppInfo.permissions
                 }
                 
                 LazyColumn(

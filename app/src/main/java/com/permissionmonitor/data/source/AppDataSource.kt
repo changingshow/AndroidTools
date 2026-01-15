@@ -12,26 +12,24 @@ class AppDataSource(private val context: Context) {
     
     private val packageManager: PackageManager = context.packageManager
     
+    @Suppress("DEPRECATION")
     fun getInstalledApps(includeSystemApps: Boolean = false): List<AppInfo> {
-        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-            PackageManager.GET_PERMISSIONS or PackageManager.MATCH_UNINSTALLED_PACKAGES
-        } else {
-            @Suppress("DEPRECATION")
-            PackageManager.GET_PERMISSIONS or PackageManager.GET_UNINSTALLED_PACKAGES
-        }
-        
+        val flags = PackageManager.GET_PERMISSIONS
         val packages = packageManager.getInstalledPackages(flags)
         
         return packages
             .filter { packageInfo ->
-                if (includeSystemApps) {
+                val appInfo = packageInfo.applicationInfo
+                if (appInfo == null) {
+                    false
+                } else if (includeSystemApps) {
                     true
                 } else {
-                    (packageInfo.applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0
+                    (appInfo.flags and ApplicationInfo.FLAG_SYSTEM) == 0
                 }
             }
             .filter { it.packageName != context.packageName }
-            .map { packageInfo -> createAppInfo(packageInfo) }
+            .mapNotNull { packageInfo -> createAppInfo(packageInfo) }
             .sortedByDescending { it.dangerousPermissions }
     }
     
@@ -45,21 +43,21 @@ class AppDataSource(private val context: Context) {
         }
     }
     
-    private fun createAppInfo(packageInfo: PackageInfo): AppInfo {
-        val applicationInfo = packageInfo.applicationInfo
+    @Suppress("DEPRECATION")
+    private fun createAppInfo(packageInfo: PackageInfo): AppInfo? {
+        val applicationInfo = packageInfo.applicationInfo ?: return null
         val permissions = getPermissionDetails(packageInfo)
         
         val versionCode = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             packageInfo.longVersionCode
         } else {
-            @Suppress("DEPRECATION")
             packageInfo.versionCode.toLong()
         }
         
         return AppInfo(
             packageName = packageInfo.packageName,
             appName = applicationInfo.loadLabel(packageManager).toString(),
-            icon = applicationInfo.loadIcon(packageManager),
+            icon = try { applicationInfo.loadIcon(packageManager) } catch (e: Exception) { null },
             versionName = packageInfo.versionName,
             versionCode = versionCode,
             isSystemApp = (applicationInfo.flags and ApplicationInfo.FLAG_SYSTEM) != 0,
@@ -74,10 +72,10 @@ class AppDataSource(private val context: Context) {
     
     private fun getPermissionDetails(packageInfo: PackageInfo): List<PermissionDetail> {
         val requestedPermissions = packageInfo.requestedPermissions ?: return emptyList()
-        val requestedPermissionsFlags = packageInfo.requestedPermissionsFlags ?: return emptyList()
+        val requestedPermissionsFlags = packageInfo.requestedPermissionsFlags
         
         return requestedPermissions.mapIndexed { index, permission ->
-            val isGranted = if (index < requestedPermissionsFlags.size) {
+            val isGranted = if (requestedPermissionsFlags != null && index < requestedPermissionsFlags.size) {
                 (requestedPermissionsFlags[index] and PackageInfo.REQUESTED_PERMISSION_GRANTED) != 0
             } else {
                 false

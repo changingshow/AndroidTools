@@ -9,29 +9,29 @@ import androidx.navigation.navArgument
 import com.permissionmonitor.ui.screen.AppDetailScreen
 import com.permissionmonitor.ui.screen.AppListScreen
 
-sealed class Screen(val route: String) {
-    data object AppList : Screen("app_list")
-    data object AppDetail : Screen("app_detail/{packageName}") {
-        fun createRoute(packageName: String) = "app_detail/$packageName"
-    }
+object Routes {
+    const val APP_LIST = "app_list"
+    const val APP_DETAIL = "app_detail/{packageName}"
+    
+    fun appDetail(packageName: String) = "app_detail/$packageName"
 }
 
 @Composable
 fun NavGraph(navController: NavHostController) {
     NavHost(
         navController = navController,
-        startDestination = Screen.AppList.route
+        startDestination = Routes.APP_LIST
     ) {
-        composable(Screen.AppList.route) {
+        composable(Routes.APP_LIST) {
             AppListScreen(
                 onAppClick = { packageName ->
-                    navController.navigate(Screen.AppDetail.createRoute(packageName))
+                    navController.navigate(Routes.appDetail(packageName))
                 }
             )
         }
         
         composable(
-            route = Screen.AppDetail.route,
+            route = Routes.APP_DETAIL,
             arguments = listOf(
                 navArgument("packageName") { type = NavType.StringType }
             )

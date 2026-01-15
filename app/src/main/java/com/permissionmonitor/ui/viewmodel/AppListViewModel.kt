@@ -5,10 +5,12 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.permissionmonitor.data.model.AppInfo
 import com.permissionmonitor.data.repository.AppRepository
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 data class AppListUiState(
     val apps: List<AppInfo> = emptyList(),
@@ -35,7 +37,9 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
         viewModelScope.launch {
             _uiState.value = _uiState.value.copy(isLoading = true, error = null)
             try {
-                allApps = repository.getInstalledApps(_uiState.value.includeSystemApps)
+                allApps = withContext(Dispatchers.IO) {
+                    repository.getInstalledApps(_uiState.value.includeSystemApps)
+                }
                 filterApps()
             } catch (e: Exception) {
                 _uiState.value = _uiState.value.copy(
