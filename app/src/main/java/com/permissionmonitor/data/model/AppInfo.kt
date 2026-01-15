@@ -12,5 +12,7 @@ data class AppInfo(
     val permissions: List<PermissionDetail> = emptyList(),
     val totalPermissions: Int = 0,
     val grantedPermissions: Int = 0,
-    val dangerousPermissions: Int = 0
+    val dangerousPermissions: Int = 0,
+    val installTime: Long = 0,
+    val updateTime: Long = 0
 )

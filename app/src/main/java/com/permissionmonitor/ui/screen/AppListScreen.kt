@@ -16,7 +16,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.Search
+import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -32,6 +35,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
@@ -43,6 +49,7 @@ import com.permissionmonitor.ui.components.NoAppsFoundView
 import com.permissionmonitor.ui.components.PermissionRequiredView
 import com.permissionmonitor.ui.components.SummaryCard
 import com.permissionmonitor.ui.viewmodel.AppListViewModel
+import com.permissionmonitor.ui.viewmodel.SortType
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -75,6 +82,8 @@ fun AppListScreen(
                     titleContentColor = MaterialTheme.colorScheme.onPrimary
                 ),
                 actions = {
+                    var showSortMenu by remember { mutableStateOf(false) }
+                    
                     IconButton(onClick = { viewModel.loadApps() }) {
                         Icon(
                             Icons.Default.Refresh, 
@@ -82,6 +91,36 @@ fun AppListScreen(
                             tint = MaterialTheme.colorScheme.onPrimary
                         )
                     }
+                    
+                    Box {
+                        IconButton(onClick = { showSortMenu = true }) {
+                            Icon(
+                                Icons.Default.Sort,
+                                contentDescription = "排序",
+                                tint = MaterialTheme.colorScheme.onPrimary
+                            )
+                        }
+                        DropdownMenu(
+                            expanded = showSortMenu,
+                            onDismissRequest = { showSortMenu = false }
+                        ) {
+                            SortType.entries.forEach { sortType ->
+                                DropdownMenuItem(
+                                    text = { 
+                                        Text(
+                                            text = sortType.label,
+                                            fontWeight = if (uiState.sortType == sortType) FontWeight.Bold else FontWeight.Normal
+                                        )
+                                    },
+                                    onClick = {
+                                        viewModel.setSortType(sortType)
+                                        showSortMenu = false
+                                    }
+                                )
+                            }
+                        }
+                    }
+                    
                     IconButton(onClick = onAboutClick) {
                         Icon(
                             Icons.Default.Info, 

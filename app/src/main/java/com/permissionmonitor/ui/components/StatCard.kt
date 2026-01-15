@@ -95,18 +95,23 @@ fun SummaryCard(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                StatItemWhite(
+                StatItemCircle(
                     value = totalApps.toString(),
-                    label = "已扫描"
+                    label = "已扫描",
+                    backgroundColor = Color.White.copy(alpha = 0.2f),
+                    textColor = Color.White
                 )
-                StatItemWhite(
+                StatItemCircle(
                     value = safeApps.toString(),
-                    label = "安全"
+                    label = "安全",
+                    backgroundColor = Green500.copy(alpha = 0.9f),
+                    textColor = Color.White
                 )
-                StatItemWhite(
+                StatItemCircle(
                     value = riskyApps.toString(),
                     label = "有风险",
-                    highlight = riskyApps > 0
+                    backgroundColor = if (riskyApps > 0) Red500.copy(alpha = 0.9f) else Orange500.copy(alpha = 0.9f),
+                    textColor = Color.White
                 )
             }
         }
@@ -114,26 +119,35 @@ fun SummaryCard(
 }
 
 @Composable
-private fun StatItemWhite(
+private fun StatItemCircle(
     value: String,
     label: String,
-    highlight: Boolean = false,
+    backgroundColor: Color,
+    textColor: Color,
     modifier: Modifier = Modifier
 ) {
     Column(
         modifier = modifier,
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = value,
-            style = MaterialTheme.typography.headlineMedium,
-            fontWeight = FontWeight.Bold,
-            color = if (highlight) Color(0xFFFFCDD2) else Color.White
-        )
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .background(backgroundColor, CircleShape),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = textColor
+            )
+        }
+        Spacer(modifier = Modifier.height(6.dp))
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = Color.White.copy(alpha = 0.8f)
+            color = Color.White.copy(alpha = 0.9f)
         )
     }
 }

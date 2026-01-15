@@ -66,7 +66,9 @@ class AppDataSource(private val context: Context) {
             grantedPermissions = permissions.count { it.isGranted },
             dangerousPermissions = permissions.count { 
                 PermissionClassifier.isDangerousPermission(it.name) && it.isGranted 
-            }
+            },
+            installTime = packageInfo.firstInstallTime,
+            updateTime = packageInfo.lastUpdateTime
         )
     }
     

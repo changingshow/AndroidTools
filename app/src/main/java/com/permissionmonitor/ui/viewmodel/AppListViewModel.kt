@@ -15,6 +15,13 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
+enum class SortType(val label: String) {
+    RISK("按风险"),
+    NAME("按名称"),
+    INSTALL_TIME("按安装时间"),
+    UPDATE_TIME("按更新时间")
+}
+
 data class AppListUiState(
     val apps: List<AppInfo> = emptyList(),
     val isLoading: Boolean = true,
@@ -24,7 +31,8 @@ data class AppListUiState(
     val needsPermission: Boolean = false,
     val totalApps: Int = 0,
     val safeApps: Int = 0,
-    val riskyApps: Int = 0
+    val riskyApps: Int = 0,
+    val sortType: SortType = SortType.RISK
 )
 
 class AppListViewModel(application: Application) : AndroidViewModel(application) {
@@ -93,6 +101,11 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
         context.startActivity(intent)
     }
     
+    fun setSortType(sortType: SortType) {
+        _uiState.value = _uiState.value.copy(sortType = sortType)
+        filterApps()
+    }
+    
     private fun filterApps() {
         val query = _uiState.value.searchQuery.lowercase()
         val filtered = if (query.isBlank()) {
@@ -103,8 +116,16 @@ class AppListViewModel(application: Application) : AndroidViewModel(application)
                 app.packageName.lowercase().contains(query)
             }
         }
+        
+        val sorted = when (_uiState.value.sortType) {
+            SortType.RISK -> filtered.sortedByDescending { it.dangerousPermissions }
+            SortType.NAME -> filtered.sortedBy { it.appName.lowercase() }
+            SortType.INSTALL_TIME -> filtered.sortedByDescending { it.installTime }
+            SortType.UPDATE_TIME -> filtered.sortedByDescending { it.updateTime }
+        }
+        
         _uiState.value = _uiState.value.copy(
-            apps = filtered,
+            apps = sorted,
             isLoading = false
         )
     }
