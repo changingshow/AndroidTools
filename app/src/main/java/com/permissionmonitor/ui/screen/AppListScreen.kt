@@ -65,19 +65,10 @@ fun AppListScreen(
         topBar = {
             TopAppBar(
                 title = { 
-                    Column {
-                        Text(
-                            "权限监控",
-                            fontWeight = FontWeight.Bold
-                        )
-                        if (!uiState.isLoading && uiState.apps.isNotEmpty()) {
-                            Text(
-                                "保护您的隐私安全",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onPrimary.copy(alpha = 0.8f)
-                            )
-                        }
-                    }
+                    Text(
+                        "权限监控",
+                        fontWeight = FontWeight.Bold
+                    )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
                     containerColor = MaterialTheme.colorScheme.primary,

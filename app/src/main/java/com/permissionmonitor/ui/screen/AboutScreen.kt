@@ -152,26 +152,17 @@ fun AboutScreen(
                 ),
                 elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
             ) {
-                Column {
-                    SettingsItem(
-                        icon = Icons.Default.Settings,
-                        title = "应用设置",
-                        subtitle = "管理本应用的系统权限",
-                        onClick = {
-                            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                                data = Uri.parse("package:${context.packageName}")
-                            }
-                            context.startActivity(intent)
+                SettingsItem(
+                    icon = Icons.Default.Settings,
+                    title = "应用设置",
+                    subtitle = "管理本应用的系统权限",
+                    onClick = {
+                        val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                            data = Uri.parse("package:${context.packageName}")
                         }
-                    )
-                    
-                    SettingsItem(
-                        icon = Icons.Default.Security,
-                        title = "权限说明",
-                        subtitle = "了解本应用需要的权限及用途",
-                        onClick = { }
-                    )
-                }
+                        context.startActivity(intent)
+                    }
+                )
             }
             
             Spacer(modifier = Modifier.height(16.dp))

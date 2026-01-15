@@ -46,45 +46,95 @@ fun SummaryCard(
             .padding(16.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.primary
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(20.dp)
         ) {
-            Text(
-                text = "扫描概览",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            // 顶部：图标和标题
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .background(Color.White.copy(alpha = 0.2f), CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        Icons.Default.Shield,
+                        contentDescription = null,
+                        tint = Color.White,
+                        modifier = Modifier.size(32.dp)
+                    )
+                }
+                
+                Spacer(modifier = Modifier.width(16.dp))
+                
+                Column {
+                    Text(
+                        text = "权限监控",
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = FontWeight.Bold,
+                        color = Color.White
+                    )
+                    Text(
+                        text = "保护您的隐私安全",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = Color.White.copy(alpha = 0.8f)
+                    )
+                }
+            }
             
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(20.dp))
             
+            // 底部：统计数据
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceEvenly
             ) {
-                StatItem(
-                    icon = Icons.Default.Apps,
+                StatItemWhite(
                     value = totalApps.toString(),
-                    label = "已扫描",
-                    color = MaterialTheme.colorScheme.primary
+                    label = "已扫描"
                 )
-                StatItem(
-                    icon = Icons.Default.Shield,
+                StatItemWhite(
                     value = safeApps.toString(),
-                    label = "安全",
-                    color = Green500
+                    label = "安全"
                 )
-                StatItem(
-                    icon = Icons.Default.Warning,
+                StatItemWhite(
                     value = riskyApps.toString(),
                     label = "有风险",
-                    color = if (riskyApps > 0) Red500 else Orange500
+                    highlight = riskyApps > 0
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun StatItemWhite(
+    value: String,
+    label: String,
+    highlight: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Text(
+            text = value,
+            style = MaterialTheme.typography.headlineMedium,
+            fontWeight = FontWeight.Bold,
+            color = if (highlight) Color(0xFFFFCDD2) else Color.White
+        )
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = Color.White.copy(alpha = 0.8f)
+        )
     }
 }
 

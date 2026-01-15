@@ -130,23 +130,13 @@ fun AppListItem(
             
             Spacer(modifier = Modifier.width(8.dp))
             
-            // 风险指示器
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .background(riskLevel.color, CircleShape)
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-                Icon(
-                    Icons.Default.ChevronRight,
-                    contentDescription = "查看详情",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(20.dp)
-                )
-            }
+            // 箭头指示器
+            Icon(
+                Icons.Default.ChevronRight,
+                contentDescription = "查看详情",
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp)
+            )
         }
     }
 }
